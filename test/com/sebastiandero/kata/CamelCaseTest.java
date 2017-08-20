@@ -1,5 +1,6 @@
-package com.sebastiandero;
+package com.sebastiandero.kata;
 
+import com.sebastiandero.kata.CamelCase;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

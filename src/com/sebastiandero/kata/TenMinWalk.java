@@ -1,4 +1,4 @@
-package com.sebastiandero;
+package com.sebastiandero.kata;
 
 public class TenMinWalk {
     public static boolean isValid(char[] walk) {

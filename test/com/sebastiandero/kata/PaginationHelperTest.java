@@ -1,5 +1,6 @@
-package com.sebastiandero;
+package com.sebastiandero.kata;
 
+import com.sebastiandero.kata.PaginationHelper;
 import org.junit.Before;
 import org.junit.Test;
 

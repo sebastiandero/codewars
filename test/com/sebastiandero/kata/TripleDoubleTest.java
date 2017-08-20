@@ -1,5 +1,6 @@
-package com.sebastiandero;
+package com.sebastiandero.kata;
 
+import com.sebastiandero.kata.TripleDouble;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

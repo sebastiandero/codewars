@@ -1,4 +1,4 @@
-package com.sebastiandero;
+package com.sebastiandero.kata;
 
 import java.util.Arrays;
 
