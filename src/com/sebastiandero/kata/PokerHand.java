@@ -15,12 +15,6 @@ public class PokerHand implements Comparable<PokerHand> {
         this.hand = hand;
     }
 
-    public static void main(String[] args) {
-        PokerHand pokerHand = new PokerHand("KS AS TS QS JS");
-        PokerHand pokerHand2 = new PokerHand("TS AS 6S QS JS");
-        int res = pokerHand.compareTo(pokerHand2);
-    }
-
     private int[] breakIntoIntArr(String hand) {
         String[] stringCards = hand.split(" ");
         int[] convertedCards = new int[5];
