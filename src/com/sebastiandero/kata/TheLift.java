@@ -12,6 +12,10 @@ public class TheLift {
         TheLift.queues = queues;
 
         Lift lift = new Lift(capacity);
+        for (int i = 0; i < queues.length; i++) {
+            System.out.println(String.format("Floor %s: %s", i, Arrays.toString(queues[i])));
+        }
+        System.out.println("-");
 
         while (!allArrived(lift)) {
             lift.move();
@@ -64,9 +68,9 @@ public class TheLift {
         }
 
         void move() {
-            goToNextFloor();
             deliverPassengers();
             pickupPassengers();
+            goToNextFloor();
         }
 
         private void deliverPassengers() {
@@ -125,7 +129,7 @@ public class TheLift {
         }
 
         private boolean moveDownIfUseful() {
-            for (int i = floor; i >= 0; i--) {
+            for (int i = floor - 1; i >= 0; i--) {
                 if (moveIfPassengerDestination(i)) {
                     return true;
                 }
@@ -137,7 +141,7 @@ public class TheLift {
         }
 
         private boolean moveUpIfUseful() {
-            for (int i = floor; i < queues.length; i++) {
+            for (int i = floor + 1; i < queues.length; i++) {
                 if (moveIfPassengerDestination(i)) {
                     return true;
                 }
@@ -196,6 +200,12 @@ public class TheLift {
             }
             this.floor = floor;
             floorHistory.add(floor);
+            if (floor == queues.length - 1) {
+                travelingUp = false;
+            }
+            if (floor == 0) {
+                travelingUp = true;
+            }
         }
     }
 }
