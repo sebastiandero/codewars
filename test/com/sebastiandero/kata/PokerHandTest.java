@@ -30,10 +30,8 @@ public class PokerHandTest {
         expected.add(new PokerHand("2S AH 4H 5S KC"));
         expected.add(new PokerHand("2S 3H 6H 7S 9C"));
 
-        //Random random = new Random();
-        //ArrayList<PokerHand> actual = createRandomOrderedList(random, expected);
-        ArrayList<PokerHand> actual = new ArrayList<>(expected);
-
+        Random random = new Random();
+        ArrayList<PokerHand> actual = createRandomOrderedList(random, expected);
         // Act
         Collections.sort(actual);
 

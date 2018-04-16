@@ -54,8 +54,9 @@ public class PokerHand implements Comparable<PokerHand> {
         //Straight flush
         int straightResult = compareStraight(other);
         int flushResult = compareFlush(other);
-        if (straightResult != -2 && flushResult != -2 && straightResult == flushResult) {
-            return straightResult * (-1);
+        int straightFlushResult = compareStraightFlush(other);
+        if (straightFlushResult != -2) {
+            return straightFlushResult * (-1);
         }
         //four of a kind
         int fourOfAKindResult = compareFourOfAKind(other);
@@ -63,11 +64,11 @@ public class PokerHand implements Comparable<PokerHand> {
             return fourOfAKindResult * (-1);
         }
         //full house
-        int pairsResult = comparePairs(other);
-        int threeOfAKindResult = compareThreeOfAKind(other);
+        int pairsFullHouseResult = comparePairs(other, false);
+        int threeOfAKindFullHouseResult = compareThreeOfAKind(other, false);
 
-        if (pairsResult != -2 && threeOfAKindResult != -2) {
-            return compareFullHouse(pairsResult, threeOfAKindResult) * (-1);
+        if (pairsFullHouseResult != -2 && threeOfAKindFullHouseResult != -2) {
+            return compareFullHouse(pairsFullHouseResult, threeOfAKindFullHouseResult) * (-1);
         }
         //flush
         if (flushResult != -2) {
@@ -78,15 +79,40 @@ public class PokerHand implements Comparable<PokerHand> {
             return straightResult * (-1);
         }
         //three of a kind
+        int threeOfAKindResult = compareThreeOfAKind(other, true);
         if (threeOfAKindResult != -2) {
             return threeOfAKindResult * (-1);
         }
         //pairs
+        int pairsResult = comparePairs(other, true);
         if (pairsResult != -2) {
             return pairsResult * (-1);
         }
         //high card
         return compareHighCard(other) * (-1);
+    }
+
+    private int compareStraightFlush(PokerHand other) {
+        int s1 = getStraight();
+        int s2 = other.getStraight();
+
+        boolean f1 = hasFlush();
+        boolean f2 = other.hasFlush();
+
+        boolean isStraightFlush = f1 && s1 != -1;
+        boolean isStraightFlushOther = f2 && s2 != -1;
+
+        if (!(isStraightFlush || isStraightFlushOther)) {
+            return -2;
+        }
+        if (!isStraightFlushOther) {
+            return 1;
+        }
+        if (!isStraightFlush) {
+            return -1;
+        }
+
+        return compareStraight(other);
     }
 
     private int compareFourOfAKind(PokerHand other) {
@@ -97,7 +123,7 @@ public class PokerHand implements Comparable<PokerHand> {
         }
         int compareResult = Integer.compare(f1, f2);
         if (compareResult == 0) {
-            return compareKicker(other, new int[]{f1});
+            return compareKicker(other, new int[]{f1}, true);
         }
         return Integer.compare(f1, f2);
     }
@@ -119,14 +145,8 @@ public class PokerHand implements Comparable<PokerHand> {
     }
 
     private int compareFlush(PokerHand other) {
-        boolean hasFlush = suits[0] == suits[1]
-                && suits[0] == suits[2]
-                && suits[0] == suits[3]
-                && suits[0] == suits[4];
-        boolean otherHasFlush = other.suits[0] == other.suits[1]
-                && other.suits[0] == other.suits[2]
-                && other.suits[0] == other.suits[3]
-                && other.suits[0] == other.suits[4];
+        boolean hasFlush = hasFlush();
+        boolean otherHasFlush = other.hasFlush();
 
         if (hasFlush && !otherHasFlush) {
             return 1;
@@ -146,6 +166,13 @@ public class PokerHand implements Comparable<PokerHand> {
         }
 
         return 0;
+    }
+
+    private boolean hasFlush() {
+        return suits[0] == suits[1]
+                && suits[0] == suits[2]
+                && suits[0] == suits[3]
+                && suits[0] == suits[4];
     }
 
     private int compareStraight(PokerHand other) {
@@ -171,7 +198,7 @@ public class PokerHand implements Comparable<PokerHand> {
         return -1;
     }
 
-    private int compareThreeOfAKind(PokerHand other) {
+    private int compareThreeOfAKind(PokerHand other, boolean kicker) {
         int t1 = getThreeOfAKind();
         int t2 = other.getThreeOfAKind();
         if (t1 == -1 && t2 == -1) {
@@ -179,7 +206,7 @@ public class PokerHand implements Comparable<PokerHand> {
         }
         int compareResult = Integer.compare(t1, t2);
         if (compareResult == 0) {
-            return compareKicker(other, new int[]{t1});
+            return compareKicker(other, new int[]{t1}, kicker);
         }
         return compareResult;
     }
@@ -193,7 +220,7 @@ public class PokerHand implements Comparable<PokerHand> {
         return -1;
     }
 
-    private int comparePairs(PokerHand other) {
+    private int comparePairs(PokerHand other, boolean kicker) {
         int[] pairs = getPairs();
         int[] otherPairs = other.getPairs();
         if (pairs.length != 0 || otherPairs.length != 0) {
@@ -205,7 +232,7 @@ public class PokerHand implements Comparable<PokerHand> {
                     return Integer.compare(pairs[i], otherPairs[i]);
                 }
             }
-            return compareKicker(other, pairs);
+            return compareKicker(other, pairs, kicker);
         }
         return -2;
     }
@@ -231,12 +258,15 @@ public class PokerHand implements Comparable<PokerHand> {
     private int compareHighCard(PokerHand other) {
         int compareRes = Integer.compare(cards[4], other.cards[4]);
         if (compareRes == 0) {
-            return compareKicker(other, new int[]{cards[4]});
+            return compareKicker(other, new int[]{cards[4]}, true);
         }
         return compareRes;
     }
 
-    private Integer compareKicker(PokerHand other, int[] ignored) {
+    private Integer compareKicker(PokerHand other, int[] ignored, boolean kicker) {
+        if (!kicker) {
+            return 0;
+        }
         //kickers
         for (int i = cards.length - 1; i >= 0; i--) {
             if (cards[i] != other.cards[i]) {
