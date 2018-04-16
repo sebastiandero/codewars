@@ -36,20 +36,16 @@ public class TheLift {
         queues[floor] = people.stream().mapToInt(i -> i).toArray();
     }
 
-    private static int pop(int floor) {
+    private static int pop(int floor, int index) {
         List<Integer> people = Arrays.stream(queues[floor]).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
         int person;
         if (people.size() == 0) {
             person = -1;
-            people = new ArrayList<>();
-        } else if (people.size() == 1) {
-            person = people.get(0);
-            people = new ArrayList<>();
         } else {
-            person = people.get(0);
-            people = people.subList(1, people.size());
+            person = people.get(index);
+            people.set(index, -1);
         }
-        queues[floor] = people.stream().mapToInt(i -> i).toArray();
+        queues[floor] = people.stream().filter(i -> i >= 0).mapToInt(i -> i).toArray();
         return person;
     }
 
@@ -57,7 +53,7 @@ public class TheLift {
         private final int capacity;
         private List<Integer> passengers;
         private List<Integer> floorHistory;
-        private int floor;
+        private int floor = -1;
         private boolean travelingUp = true;
 
         Lift(int capacity) {
@@ -82,44 +78,122 @@ public class TheLift {
         }
 
         private void pickupPassengers() {
-            if (capacity > passengers.size()) {
-                while (capacity > passengers.size() && queues[floor].length != 0 && anyGoingSameWay(floor)) {
-                    passengers.add(pop(floor));
+            for (int i = 0; i < queues[floor].length && capacity > passengers.size(); i++) {
+                int destination = queues[floor][i];
+                if (isGoingSameWay(destination, floor)) {
+                    passengers.add(pop(floor, i));
+                    i--;//decrease because of in use change of array
                 }
             }
         }
 
         private void goToNextFloor() {
-            for (int i = 0; i < queues.length; i++) {
-                int possibleFloor = i;
-                if (passengers.stream().anyMatch(dest -> dest == possibleFloor)) {
-                    changeFloor(i);
+            if (travelingUp) {
+                if (moveUpIfUseful()) {
                     return;
                 }
-                if (anyGoingSameWay(i)) {
-                    changeFloor(i);
+                if (passengers.size() == 0 && smartUp()) {
+                    return;
+                }
+            } else {
+                if (moveDownIfUseful()) {
+                    return;
+                }
+                if (passengers.size() == 0 && smartDown()) {
                     return;
                 }
             }
             changeFloor(0);
         }
 
-        private boolean anyGoingSameWay(int floor) {
-            for (int j = 0; j < queues[floor].length; j++) {
-                if (travelingUp) {
-                    if (queues[floor][j] > floor) {
-                        return true;
-                    }
-                } else {
-                    if (queues[floor][j] < floor) {
-                        return true;
-                    }
+        private boolean smartDown() {
+            for (int i = 0; i <= floor; i++) {
+                if (moveIfAnyGoingDifferentWay(i)) {
+                    return true;
                 }
             }
             return false;
         }
 
+        private boolean smartUp() {
+            for (int i = queues.length - 1; i >= floor; i--) {
+                if (moveIfAnyGoingDifferentWay(i)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean moveDownIfUseful() {
+            for (int i = floor; i >= 0; i--) {
+                if (moveIfPassengerDestination(i)) {
+                    return true;
+                }
+                if (moveIfAnyGoingSameWay(i)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean moveUpIfUseful() {
+            for (int i = floor; i < queues.length; i++) {
+                if (moveIfPassengerDestination(i)) {
+                    return true;
+                }
+                if (moveIfAnyGoingSameWay(i)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean moveIfPassengerDestination(int floor) {
+            if (passengers.stream().anyMatch(dest -> dest == floor)) {
+                changeFloor(floor);
+                return true;
+            }
+            return false;
+        }
+
+        private boolean moveIfAnyGoingSameWay(int floor) {
+            for (int i = 0; i < queues[floor].length; i++) {
+                if (isGoingSameWay(queues[floor][i], floor)) {
+                    changeFloor(floor);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean moveIfAnyGoingDifferentWay(int floor) {
+            for (int i = 0; i < queues[floor].length; i++) {
+                if (queues[floor][i] != floor && !isGoingSameWay(queues[floor][i], floor)) {
+                    changeFloor(floor);
+                    travelingUp = false;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean isGoingSameWay(int destination, int currentFloor) {
+            if (travelingUp) {
+                return destination > currentFloor;
+            } else {
+                return destination < currentFloor;
+            }
+        }
+
         private void changeFloor(int floor) {
+            if (this.floor == floor) {
+                return;
+            }
+            if (travelingUp && floor < this.floor) {
+                travelingUp = false;
+            } else if (!travelingUp && floor > this.floor) {
+                travelingUp = true;
+            }
             this.floor = floor;
             floorHistory.add(floor);
         }
