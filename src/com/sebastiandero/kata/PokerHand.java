@@ -95,6 +95,10 @@ public class PokerHand implements Comparable<PokerHand> {
         if (f1 == -1 && f2 == -1) {
             return -2;
         }
+        int compareResult = Integer.compare(f1, f2);
+        if (compareResult == 0) {
+            return compareKicker(other, new int[]{f1});
+        }
         return Integer.compare(f1, f2);
     }
 
@@ -173,7 +177,11 @@ public class PokerHand implements Comparable<PokerHand> {
         if (t1 == -1 && t2 == -1) {
             return -2;
         }
-        return Integer.compare(t1, t2);
+        int compareResult = Integer.compare(t1, t2);
+        if (compareResult == 0) {
+            return compareKicker(other, new int[]{t1});
+        }
+        return compareResult;
     }
 
     private int getThreeOfAKind() {
@@ -197,7 +205,7 @@ public class PokerHand implements Comparable<PokerHand> {
                     return Integer.compare(pairs[i], otherPairs[i]);
                 }
             }
-            return 0;
+            return compareKicker(other, pairs);
         }
         return -2;
     }
@@ -220,8 +228,31 @@ public class PokerHand implements Comparable<PokerHand> {
         return pairs.stream().mapToInt(i -> i).toArray();
     }
 
-    private int compareHighCard(PokerHand o) {
-        return Integer.compare(cards[4], o.cards[4]);
+    private int compareHighCard(PokerHand other) {
+        int compareRes = Integer.compare(cards[4], other.cards[4]);
+        if (compareRes == 0) {
+            return compareKicker(other, new int[]{cards[4]});
+        }
+        return compareRes;
+    }
+
+    private Integer compareKicker(PokerHand other, int[] ignored) {
+        //kickers
+        for (int i = cards.length - 1; i >= 0; i--) {
+            if (cards[i] != other.cards[i]) {
+                boolean notIgnored = true;
+                for (int pair : ignored) {
+                    if (pair == cards[i]) {
+                        notIgnored = false;
+                        break;
+                    }
+                }
+                if (notIgnored) {
+                    return Integer.compare(cards[i], other.cards[i]);
+                }
+            }
+        }
+        return 0;
     }
 
     @Override
