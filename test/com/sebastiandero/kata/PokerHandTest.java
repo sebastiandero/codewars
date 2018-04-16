@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -31,17 +30,17 @@ public class PokerHandTest {
         expected.add(new PokerHand("2S AH 4H 5S KC"));
         expected.add(new PokerHand("2S 3H 6H 7S 9C"));
 
-        Random random = new Random();
-        ArrayList<PokerHand> actual = createRandomOrderedList(random, expected);
+        //Random random = new Random();
+        //ArrayList<PokerHand> actual = createRandomOrderedList(random, expected);
+        ArrayList<PokerHand> actual = new ArrayList<>(expected);
 
         // Act
         Collections.sort(actual);
 
-        // Assert
-        Iterator a = actual.iterator();
-        for (PokerHand e : expected) {
-            assertEquals(e, a.next());
-        }
+        System.out.println(expected);
+        System.out.println(actual);
+
+        assertEquals(expected.toString(), actual.toString());
     }
 
     private ArrayList<PokerHand> createRandomOrderedList(Random random, ArrayList<PokerHand> expected) {

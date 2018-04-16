@@ -8,9 +8,11 @@ public class PokerHand implements Comparable<PokerHand> {
 
     private int[] cards;
     private char[] suits;
+    private String hand;
 
     public PokerHand(String hand) {
         this.cards = breakIntoIntArr(hand);
+        this.hand = hand;
     }
 
     public static void main(String[] args) {
@@ -55,36 +57,61 @@ public class PokerHand implements Comparable<PokerHand> {
 
     @Override
     public int compareTo(PokerHand other) {
-
+        //Straight flush
+        int straightResult = compareStraight(other);
+        int flushResult = compareFlush(other);
+        if (straightResult != -2 && flushResult != -2 && straightResult == flushResult) {
+            return straightResult * (-1);
+        }
+        //four of a kind
+        int fourOfAKindResult = compareFourOfAKind(other);
+        if (fourOfAKindResult != -2) {
+            return fourOfAKindResult * (-1);
+        }
+        //full house
         int pairsResult = comparePairs(other);
         int threeOfAKindResult = compareThreeOfAKind(other);
-        //full house
+
         if (pairsResult != -2 && threeOfAKindResult != -2) {
-            return compareFullHouse(pairsResult, threeOfAKindResult);
+            return compareFullHouse(pairsResult, threeOfAKindResult) * (-1);
         }
         //flush
-        int flushResult = compareFlush(other);
-        if (flushResult != -1) {
-            return flushResult;
+        if (flushResult != -2) {
+            return flushResult * (-1);
         }
         //straight
-        int straight = getStraight();
-        int straightOther = other.getStraight();
-        if (straight != -1 || straightOther != -1) {
-            return Integer.compare(straight, straightOther);
+        if (straightResult != -2) {
+            return straightResult * (-1);
         }
         //three of a kind
         if (threeOfAKindResult != -2) {
-            return threeOfAKindResult;
+            return threeOfAKindResult * (-1);
         }
         //pairs
         if (pairsResult != -2) {
-            return pairsResult;
+            return pairsResult * (-1);
         }
         //high card
-        return compareHighCard(other);
+        return compareHighCard(other) * (-1);
     }
 
+    private int compareFourOfAKind(PokerHand other) {
+        int f1 = getFourOfAKind();
+        int f2 = other.getFourOfAKind();
+        if (f1 == -1 && f2 == -1) {
+            return -2;
+        }
+        return Integer.compare(f1, f2);
+    }
+
+    private int getFourOfAKind() {
+        for (int i = cards.length - 1; i > 2; i--) {
+            if (cards[i] == cards[i - 1] && cards[i] == cards[i - 2] && cards[i] == cards[i - 3]) {
+                return cards[i];
+            }
+        }
+        return -1;
+    }
 
     private int compareFullHouse(int pairsResult, int threeOfAKindResult) {
         if (threeOfAKindResult != 0) {
@@ -109,15 +136,27 @@ public class PokerHand implements Comparable<PokerHand> {
         if (!hasFlush && otherHasFlush) {
             return -1;
         }
-        if (hasFlush) {
-            for (int i = cards.length - 1; i >= 0; i--) {
-                int res = Integer.compare(cards[i], other.cards[i]);
-                if (res != 0) {
-                    return res;
-                }
+        if (!hasFlush) {
+            return -2;
+        }
+
+        for (int i = cards.length - 1; i >= 0; i--) {
+            int res = Integer.compare(cards[i], other.cards[i]);
+            if (res != 0) {
+                return res;
             }
         }
+
         return 0;
+    }
+
+    private int compareStraight(PokerHand other) {
+        int s1 = getStraight();
+        int s2 = other.getStraight();
+        if (s1 == -1 && s2 == -1) {
+            return -2;
+        }
+        return Integer.compare(s1, s2);
     }
 
     private int getStraight() {
@@ -128,7 +167,7 @@ public class PokerHand implements Comparable<PokerHand> {
             }
             //ace as 1
             if (cards[4] == 14 && cards[0] == 2) {
-                return cards[4];
+                return cards[3];
             }
         }
         return -1;
@@ -173,11 +212,14 @@ public class PokerHand implements Comparable<PokerHand> {
         List<Integer> pairs = new ArrayList<>();
         for (int i = cards.length - 1; i > 0; i--) {
             if (cards[i] == cards[i - 1]) {
-                pairs.add(cards[i]);
-                i--;
+                //look ahead and behind for three of a kind
+                if ((i - 2 < 0 || cards[i] != cards[i - 2]) && (i + 1 >= cards.length || cards[i] != cards[i + 1])) {
+                    pairs.add(cards[i]);
+                    i--;
 
-                if (pairs.size() == 2) {
-                    break;
+                    if (pairs.size() == 2) {
+                        break;
+                    }
                 }
             }
         }
@@ -186,5 +228,10 @@ public class PokerHand implements Comparable<PokerHand> {
 
     private int compareHighCard(PokerHand o) {
         return Integer.compare(cards[4], o.cards[4]);
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(cards) + Arrays.toString(suits);
     }
 }
