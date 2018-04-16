@@ -26,6 +26,15 @@ public class SnailTest {
         test(array, r);
     }
 
+    @Test
+    public void SnailTestEmpty() {
+        int[][] array
+                = {{}};
+        int[] r = {};
+        test(array, r);
+    }
+
+
     private String int2dToString(int[][] a) {
         return Arrays.stream(a).map(Arrays::toString).collect(joining("\n"));
     }

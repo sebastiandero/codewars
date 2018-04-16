@@ -12,16 +12,16 @@ public class Snail {
     }
 
     public static int[] snail(int[][] array) {
+        if (array.length > 0 && array[0].length == 0) {
+            return new int[0];
+        }
+
         boolean isEven = array.length % 2 == 0;
 
         ArrayList<Integer> list = new ArrayList<>();
 
         for (int i = 0; isEven ? i < array.length / 2 : i <= Math.ceil(array.length / 2); i++) {
             list.addAll(forOffset(array, i));
-        }
-
-        if(list.isEmpty()){
-            return new int[0];
         }
 
         return list.stream().mapToInt(i -> i).toArray();
