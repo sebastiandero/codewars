@@ -18,7 +18,7 @@ public class TheLiftTests {
                 new int[0], // 6
         };
         final int[] result = TheLift.theLift(queues, 5);
-        assertArrayEquals(new int[]{0, 2, 5, 0}, result);
+        assertArrayEquals(new int[]{0, 1, 5, 6, 5, 1, 0, 1, 0}, result);
     }
 
     @Test
@@ -34,6 +34,51 @@ public class TheLiftTests {
         };
         final int[] result = TheLift.theLift(queues, 5);
         assertArrayEquals(new int[]{0, 1, 2, 3, 6, 5, 3, 2, 0}, result);
+    }
+
+    @Test
+    public void fullUpAndDown() {
+        final int[][] queues = {
+                new int[]{3, 3, 3, 3, 3, 3}, // G
+                new int[0], // 1
+                new int[0], // 2
+                new int[0], // 3
+                new int[0], // 4
+                new int[]{4, 4, 4, 4, 4, 4}, // 5
+                new int[0], // 6
+        };
+        final int[] result = TheLift.theLift(queues, 5);
+        assertArrayEquals(new int[]{0, 3, 5, 4, 0, 3, 5, 4, 0}, result);
+    }
+
+    @Test
+    public void highlander() {
+        final int[][] queues = {
+                new int[0], // G
+                new int[]{2}, // 1
+                new int[]{3, 3, 3}, // 2
+                new int[]{1}, // 3
+                new int[0], // 4
+                new int[0], // 5
+                new int[0], // 6
+        };
+        final int[] result = TheLift.theLift(queues, 1);
+        assertArrayEquals(new int[]{0, 1, 2, 3, 1, 2, 3, 2, 3, 0}, result);
+    }
+
+    @Test
+    public void liftFullDown() {
+        final int[][] queues = {
+                new int[0], // G
+                new int[0], // 1
+                new int[0], // 2
+                new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // 3
+                new int[0], // 4
+                new int[0], // 5
+                new int[0], // 6
+        };
+        final int[] result = TheLift.theLift(queues, 5);
+        assertArrayEquals(new int[]{0, 3, 1, 3, 1, 3, 1, 0}, result);
     }
 
     @Test
