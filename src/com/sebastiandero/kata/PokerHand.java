@@ -271,8 +271,8 @@ public class PokerHand implements Comparable<PokerHand> {
         for (int i = cards.length - 1; i >= 0; i--) {
             if (cards[i] != other.cards[i]) {
                 boolean notIgnored = true;
-                for (int pair : ignored) {
-                    if (pair == cards[i]) {
+                for (int card : ignored) {
+                    if (card == cards[i]) {
                         notIgnored = false;
                         break;
                     }

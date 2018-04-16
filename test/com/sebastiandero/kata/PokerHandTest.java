@@ -11,6 +11,75 @@ import static org.junit.Assert.assertEquals;
 public class PokerHandTest {
 
     @Test
+    public void kickerTIARTest() {
+        ArrayList<PokerHand> expected = new ArrayList<>();
+        expected.add(new PokerHand("AH AC 5H 6H AS"));
+        expected.add(new PokerHand("AH AC 4H 6H AS"));
+        expected.add(new PokerHand("AH AC 4H 5H AS"));
+        expected.add(new PokerHand("AH AC 3H 5H AS"));
+
+        Random random = new Random();
+        ArrayList<PokerHand> actual = createRandomOrderedList(random, expected);
+        // Act
+        Collections.sort(actual);
+
+        assertEquals(expected.toString(), actual.toString());
+
+    }
+
+    @Test
+    public void kickerFIARTest() {
+        ArrayList<PokerHand> expected = new ArrayList<>();
+        expected.add(new PokerHand("JS JD JC JH 8D"));
+        expected.add(new PokerHand("JS JD JC JH 4D"));
+        expected.add(new PokerHand("JS JD JC JH 3D"));
+        expected.add(new PokerHand("JS JD JC JH 2D"));
+
+        Random random = new Random();
+        ArrayList<PokerHand> actual = createRandomOrderedList(random, expected);
+        // Act
+        Collections.sort(actual);
+
+        assertEquals(expected.toString(), actual.toString());
+    }
+
+    @Test
+    public void kickerPairTest() {
+        ArrayList<PokerHand> expected = new ArrayList<>();
+        expected.add(new PokerHand("AH AC KH 6H 9S"));
+        expected.add(new PokerHand("AH AC TH 6H 9S"));
+        expected.add(new PokerHand("AH AC 4H 6H 9S"));
+        expected.add(new PokerHand("AH AC 5H 6H 7S"));
+        expected.add(new PokerHand("AH AC 4H 6H 7S"));
+        expected.add(new PokerHand("AH AC 4H 2H 7S"));
+
+        Random random = new Random();
+        ArrayList<PokerHand> actual = createRandomOrderedList(random, expected);
+        // Act
+        Collections.sort(actual);
+
+        assertEquals(expected.toString(), actual.toString());
+    }
+
+    @Test
+    public void kickerHCTest() {
+        ArrayList<PokerHand> expected = new ArrayList<>();
+        expected.add(new PokerHand("2S 3H 6H 7S KC"));
+        expected.add(new PokerHand("2S 3H 6H 7S QC"));
+        expected.add(new PokerHand("2S 3H 6H 7S JC"));
+        expected.add(new PokerHand("2S 3H 6H 7S TC"));
+        expected.add(new PokerHand("2S 3H 6H 7S 9C"));
+        expected.add(new PokerHand("2S 3H 6H 7S 8C"));
+
+        Random random = new Random();
+        ArrayList<PokerHand> actual = createRandomOrderedList(random, expected);
+        // Act
+        Collections.sort(actual);
+
+        assertEquals(expected.toString(), actual.toString());
+    }
+
+    @Test
     public void pokerHandSortTest() {
         // Arrange
         ArrayList<PokerHand> expected = new ArrayList<>();
@@ -35,10 +104,26 @@ public class PokerHandTest {
         // Act
         Collections.sort(actual);
 
-        System.out.println(expected);
-        System.out.println(actual);
-
         assertEquals(expected.toString(), actual.toString());
+    }
+
+    @Test
+    public void pokerHandRandomTest() {
+        for (int i = 0; i < 1500; i++) {
+            pokerHandSortTest();
+        }
+        for (int i = 0; i < 1500; i++) {
+            kickerFIARTest();
+        }
+        for (int i = 0; i < 1500; i++) {
+            kickerTIARTest();
+        }
+        for (int i = 0; i < 1500; i++) {
+            kickerPairTest();
+        }
+        for (int i = 0; i < 1500; i++) {
+            kickerHCTest();
+        }
     }
 
     private ArrayList<PokerHand> createRandomOrderedList(Random random, ArrayList<PokerHand> expected) {
