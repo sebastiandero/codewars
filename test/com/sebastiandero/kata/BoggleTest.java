@@ -84,7 +84,7 @@ public class BoggleTest {
     public void performanceTest() {
         long startTime = System.currentTimeMillis();
 
-        for (int i = 0; i < 500000; i++) {
+        for (int i = 0; i < 50000; i++) {
             sampleTests();
             grid5x5Test();
         }

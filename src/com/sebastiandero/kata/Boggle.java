@@ -58,8 +58,9 @@ public class Boggle {
     }
 
     private List<Coordinate> getNextCoordinates(List<Coordinate> possibleCoordinates, Coordinate currentCoords, List<List<Coordinate>> tree, short[] subTreeIterator, short currentCharacterInWord) {
-        List<Coordinate> nextCoords = new ArrayList<>(30);
-        for (Coordinate pc : possibleCoordinates) {
+        List<Coordinate> nextCoords = new ArrayList<>(10);
+        for (short i = 0; i < possibleCoordinates.size(); i++) {
+            Coordinate pc = possibleCoordinates.get(i);
             if (currentCoords.x == -1 && currentCoords.y == -1) {
                 nextCoords.add(pc);
             } else if (pc.x <= currentCoords.x + 1 && currentCoords.x - 1 <= pc.x && pc.y <= currentCoords.y + 1 && currentCoords.y - 1 <= pc.y) {
@@ -86,7 +87,7 @@ public class Boggle {
     }
 
     private List<Coordinate> getPossibleCoordinates(char character) {
-        List<Coordinate> ret = new ArrayList<>(30);
+        List<Coordinate> ret = new ArrayList<>(5);
         for (short i = 0; i < board.length; i++) {
             for (short j = 0; j < board[i].length; j++) {
                 if (board[i][j] == character) {
