@@ -1,40 +1,32 @@
 package com.sebastiandero.kata;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Boggle {
 
     private char[][] board;
     private char[] word;
-    private short maxRepetition;
-
 
     public Boggle(final char[][] board, final String word) {
         this.board = board;
         this.word = word.toCharArray();
-
-
-        //int[] repetitions = new int[Character.MAX_VALUE];
-/*
-        for (char[] row : board) {
-            for (char c : row) {
-                repetitions[c]++;
-            }
-        }
-        maxRepetition = (short) Arrays.stream(repetitions).max().orElse(0);*/
-        maxRepetition = 200;
     }
 
     public boolean check() {
-        short[][][] tree = new short[word.length][maxRepetition][2];
-        short[] subTreeIterator = new short[word.length + 1];
-        if (word.length != 0 && maxRepetition != 0) {
-            tree[0] = new short[][]{{-1, -1}};
+        List<List<Coordinate>> tree = new ArrayList<>(word.length);
+        if (word.length != 0) {
+            tree.add(Collections.singletonList(new Coordinate((short) -1, (short) -1)));
         }
-        short[] currentCoords;
+        for (short i = 1; i < word.length; i++) {
+            tree.add(new ArrayList<>());
+        }
+        short[] subTreeIterator = new short[word.length + 1];
+        Coordinate currentCoords;
 
         for (short i = 0; i < word.length; i++) {
-            if (subTreeIterator[i] >= tree[i].length) {
+            if (subTreeIterator[i] >= tree.get(i).size()) {
                 subTreeIterator[i] = 0;
                 i -= 2;
                 if (i < -1) {
@@ -43,13 +35,12 @@ public class Boggle {
                 subTreeIterator[i + 1]++;
                 continue;
             }
-            currentCoords = tree[i][subTreeIterator[i]];
+            currentCoords = tree.get(i).get(subTreeIterator[i]);
 
+            List<Coordinate> possibleCoordinates = getPossibleCoordinates(word[i]);
+            List<Coordinate> nextCoordinates = getNextCoordinates(possibleCoordinates, currentCoords, tree, subTreeIterator, i);
 
-            short[][] possibleCoordinates = getPossibleCoordinates(word[i]);
-            short[][] nextCoordinates = getNextCoordinates(possibleCoordinates, currentCoords, tree, subTreeIterator, i);
-
-            if (nextCoordinates.length == 0) {
+            if (nextCoordinates.size() == 0) {
                 if (i == 0) {
                     return false;
                 }
@@ -57,8 +48,8 @@ public class Boggle {
                 subTreeIterator[i + 1]++;
                 continue;
             }
-            if (i + 1 < tree.length) {
-                tree[i + 1] = nextCoordinates;
+            if (i + 1 < tree.size()) {
+                tree.set(i + 1, nextCoordinates);
             } else {
                 break;
             }
@@ -66,47 +57,53 @@ public class Boggle {
         return true;
     }
 
-    private short[][] getNextCoordinates(short[][] possibleCoordinates, short[] currentCoords, short[][][] tree, short[] subTreeIterator, int currentCharacterInWord) {
-        short[][] nextCoords = new short[maxRepetition][2];
-        short iterator = 0;
-        for (short[] pc : possibleCoordinates) {
-            if (currentCoords[0] == -1 && currentCoords[1] == -1) {
-                nextCoords[iterator] = pc;
-                iterator++;
-            } else if (pc[0] <= currentCoords[0] + 1 && currentCoords[0] - 1 <= pc[0]) {
-                if (pc[1] <= currentCoords[1] + 1 && currentCoords[1] - 1 <= pc[1]) {
-                    boolean alreadyUsed = false;
-                    for (short i = 1; i < currentCharacterInWord; i++) {
-                        if (subTreeIterator[i] < tree[i].length) {
-                            short[] treeCords = tree[i][subTreeIterator[i]];
-                            if (treeCords[0] == pc[0] && treeCords[1] == pc[1]) {
-                                alreadyUsed = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!alreadyUsed) {
-                        nextCoords[iterator] = pc;
-                        iterator++;
+    private List<Coordinate> getNextCoordinates(List<Coordinate> possibleCoordinates, Coordinate currentCoords, List<List<Coordinate>> tree, short[] subTreeIterator, short currentCharacterInWord) {
+        List<Coordinate> nextCoords = new ArrayList<>(30);
+        for (Coordinate pc : possibleCoordinates) {
+            if (currentCoords.x == -1 && currentCoords.y == -1) {
+                nextCoords.add(pc);
+            } else if (pc.x <= currentCoords.x + 1 && currentCoords.x - 1 <= pc.x && pc.y <= currentCoords.y + 1 && currentCoords.y - 1 <= pc.y) {
+                if (pc.x != currentCoords.x || pc.y != currentCoords.y) {
+                    if (!alreadyUsed(tree, subTreeIterator, currentCharacterInWord, pc)) {
+                        nextCoords.add(pc);
                     }
                 }
             }
         }
-        return Arrays.copyOfRange(nextCoords, 0, iterator);
+        return nextCoords;
     }
 
-    private short[][] getPossibleCoordinates(char character) {
-        short[][] ret = new short[maxRepetition][2];
-        short iterator = 0;
+    private boolean alreadyUsed(List<List<Coordinate>> tree, short[] subTreeIterator, short currentCharacterInWord, Coordinate pc) {
+        for (short i = 1; i < currentCharacterInWord; i++) {
+            if (subTreeIterator[i] < tree.get(i).size()) {
+                Coordinate treeCords = tree.get(i).get(subTreeIterator[i]);
+                if (treeCords.x == pc.x && treeCords.y == pc.y) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private List<Coordinate> getPossibleCoordinates(char character) {
+        List<Coordinate> ret = new ArrayList<>(30);
         for (short i = 0; i < board.length; i++) {
             for (short j = 0; j < board[i].length; j++) {
                 if (board[i][j] == character) {
-                    ret[iterator][0] = i;
-                    ret[iterator][1] = j;
-                    iterator++;
+                    ret.add(new Coordinate(j, i));
                 }
             }
         }
-        return Arrays.copyOfRange(ret, 0, iterator);
+        return ret;
+    }
+
+    private class Coordinate {
+        short x;
+        short y;
+
+        Coordinate(short x, short y) {
+            this.x = x;
+            this.y = y;
+        }
     }
 }
