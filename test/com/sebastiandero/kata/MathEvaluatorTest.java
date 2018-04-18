@@ -71,19 +71,33 @@ public class MathEvaluatorTest {
     public void testNegative() {
         testEval("-123", -123.0);
     }
-    @Test public void testLiteral() {
+
+    @Test
+    public void testLiteral() {
         testEval("123", 123.0);
     }
 
-    @Test public void testExpression() {
+    @Test
+    public void testExpression() {
         testEval("2 /2+3 * 4.75- -6", 21.25);
     }
 
-    @Test public void testSimple() {
+    @Test
+    public void testSimple() {
         testEval("12* 123", 1476.0);
     }
 
-    @Test public void testComplex() {
+    @Test
+    public void testParentheses(){
+        testEval("((80 - (19)))", 61.0);
+    }
+    @Test
+    public void testNegationHell(){
+        testEval("1 - -(-(-(-4)))", -3.0);
+    }
+
+    @Test
+    public void testComplex() {
         testEval("2 / (2 + 3) * 4.33 - -6", 7.732);
     }
 

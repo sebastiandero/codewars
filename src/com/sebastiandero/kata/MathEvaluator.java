@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 public class MathEvaluator {
 
     public double calculate(String expression) {
+        System.out.println(expression);
         ShuntingYard shuntingYard = new ShuntingYard(expression);
         String reversePolishNotation = shuntingYard.getParsedExpression();
         ReversePolishNotationSolver solver = new ReversePolishNotationSolver(reversePolishNotation);
@@ -44,7 +45,6 @@ public class MathEvaluator {
         }
     }
 
-
     public static class ShuntingYard {
         Queue<String> outputQueue = new LinkedList<>();
         Stack<Operator> operatorStack = new Stack<>();
@@ -63,9 +63,18 @@ public class MathEvaluator {
             Pattern pattern = Pattern.compile("[+\\-*/](?: *)(-\\((.*)\\))");
             Matcher matcher = pattern.matcher(expression);
 
-            while (matcher.find()) {
+            if (matcher.find()) {
                 String newGroup = String.format("(0 - (%s))", matcher.group(2));
                 sanitaryString = sanitaryString.replace(matcher.group(1), newGroup);
+                sanitaryString = sanizize(sanitaryString);
+            }
+
+            pattern = Pattern.compile("\\((?: *)(-\\((.*)\\))\\)");
+            matcher = pattern.matcher(expression);
+            if (matcher.find()) {
+                String newGroup = String.format("(0 - (%s))", matcher.group(2));
+                sanitaryString = sanitaryString.replace(matcher.group(1), newGroup);
+                sanitaryString = sanizize(sanitaryString);
             }
             return sanitaryString;
         }
@@ -80,7 +89,7 @@ public class MathEvaluator {
                 String token = tokens[i];
                 Operator operator = Operator.of(token);
 
-                if (token.matches("\\d|\\.") || i == 0 || (operator != null && wasOperator && operator.operator.equals("-"))) {
+                if (token.matches("\\d|\\.") || (operator != null && (wasOperator || i == 0) && operator.operator.equals("-"))) {
                     numberBuffer.append(token);
                     wasOperator = false;
                 } else {
