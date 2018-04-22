@@ -16,7 +16,7 @@ public class GeneticAlgorithm {
         // TODO: Implement the select method
     }
 
-    private String mutate(String chromosome, double p) {
+    private String mutate(String chromosome, double probability) {
         // TODO: Implement the mutate method
     }
 
@@ -24,11 +24,11 @@ public class GeneticAlgorithm {
         // TODO: Implement the crossover method
     }
 
-    public String run(ToDoubleFunction<String> fitness, int length, double p_c, double p_m) {
+    public String run(ToDoubleFunction<String> fitness, int length, double crossoverProbability, double mutationProbability) {
         // TODO: Implement the run method
     }
 
-    public String run(ToDoubleFunction<String> fitness, int length, double p_c, double p_m, int iterations) {
+    public String run(ToDoubleFunction<String> fitness, int length, double crossoverProbability, double mutationProbability, int iterations) {
         // TODO: Implement the run method
     }
 }
